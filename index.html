@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="UTF-8">
+    <title>Untitled</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"><link rel="stylesheet" href="/style.css">
+  </head>
+
+  <body>
+    <!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>رحلة في عالم الذرات ثلاثي الأبعاد - العناصر حتى الأرجون</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background: #050510;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #fff;
+        }
+        #ui-container {
+            position: absolute;
+            top: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+            z-index: 10;
+            pointer-events: none;
+        }
+        h1 {
+            margin: 0 0 5px 0;
+            font-size: 24px;
+            background: linear-gradient(45deg, #00ffcc, #ff007f);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 20px rgba(0,255,204,0.5);
+        }
+        #info {
+            font-size: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 6px 18px;
+            border-radius: 20px;
+            backdrop-filter: blur(5px);
+            display: inline-block;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        /* الجدول الدوري المبسط الشامل (أقل من 18) */
+        #periodic-table {
+            position: absolute;
+            top: 53%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: grid;
+            grid-template-columns: repeat(6, 75px);
+            gap: 10px;
+            z-index: 20;
+            background: rgba(10, 10, 30, 0.9);
+            padding: 20px;
+            border-radius: 20px;
+            box-shadow: 0 0 30px rgba(0,255,204,0.3);
+            border: 2px solid #00ffcc;
+            backdrop-filter: blur(10px);
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+        .element-card {
+            background: linear-gradient(135deg, #1a1a3a, #2a0845);
+            border: 2px solid #ff007f;
+            border-radius: 10px;
+            padding: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.3s;
+            box-shadow: 0 0 8px rgba(255,0,127,0.3);
+        }
+        .element-card:hover {
+            transform: scale(1.08);
+            background: linear-gradient(135deg, #00ffcc, #ff007f);
+            color: #000;
+            box-shadow: 0 0 15px #00ffcc;
+        }
+        .element-card .sym {
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .element-card .num {
+            font-size: 11px;
+            opacity: 0.8;
+        }
+        .element-card .name {
+            font-size: 11px;
+            margin-top: 2px;
+        }
+        /* زر العودة للجدول */
+        #back-btn {
+            position: absolute;
+            bottom: 50px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(45deg, #ff007f, #7f00ff);
+            border: none;
+            color: white;
+            padding: 8px 22px;
+            font-size: 15px;
+            border-radius: 25px;
+            cursor: pointer;
+            z-index: 10;
+            display: none;
+            box-shadow: 0 0 15px rgba(255,0,127,0.5);
+            transition: 0.3s;
+        }
+        #back-btn:hover {
+            transform: translateX(-50%) scale(1.05);
+            box-shadow: 0 0 25px #ff007f;
+        }
+        /* التوقيع في الأسفل */
+        #signature {
+            position: absolute;
+            bottom: 10px;
+            width: 100%;
+            text-align: center;
+            font-size: 14px;
+            color: #00ffcc;
+            z-index: 10;
+            text-shadow: 0 0 10px rgba(0,255,204,0.7);
+            letter-spacing: 1px;
+        }
+        canvas {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="ui-container">
+        <h1>المختبر الذري ثلاثي الأبعاد</h1>
+        <div id="info">اختر عنصراً (من العدد الذري 1 إلى 17) لاستكشاف بنيته</div>
+    </div>
+
+    <!-- الجدول الدوري للعناصر أقل من 18 -->
+    <div id="periodic-table">
+        <!-- سيتم تعبئته تلقائياً عبر الكود البرمجي أدناه -->
+    </div>
+
+    <button id="back-btn" onclick="showTable()">العودة إلى الجدول الدوري</button>
+    <div id="signature">من انجاز الاستاذة حمداوي</div>
+
+    <canvas id="canvas"></canvas>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+
+        function resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        // بيانات جميع العناصر ذات العدد الذري أقل من 18 (من 1 إلى 17)
+        const atomsData = {
+            1:  { name: "هيدروجين", symbol: "H", electrons: 1, shells: [1] },
+            2:  { name: "هيليوم", symbol: "He", electrons: 2, shells: [2] },
+            3:  { name: "ليثيوم", symbol: "Li", electrons: 3, shells: [2, 1] },
+            4:  { name: "بيريليوم", symbol: "Be", electrons: 4, shells: [2, 2] },
+            5:  { name: "بورون", symbol: "B", electrons: 5, shells: [2, 3] },
+            6:  { name: "كربون", symbol: "C", electrons: 6, shells: [2, 4] },
+            7:  { name: "نيتروجين", symbol: "N", electrons: 7, shells: [2, 5] },
+            8:  { name: "أكسجين", symbol: "O", electrons: 8, shells: [2, 6] },
+            9:  { name: "فلور", symbol: "F", electrons: 9, shells: [2, 7] },
+            10: { name: "نيون", symbol: "Ne", electrons: 10, shells: [2, 8] },
+            11: { name: "صوديوم", symbol: "Na", electrons: 11, shells: [2, 8, 1] },
+            12: { name: "مغنيسيوم", symbol: "Mg", electrons: 12, shells: [2, 8, 2] },
+            13: { name: "ألومنيوم", symbol: "Al", electrons: 13, shells: [2, 8, 3] },
+            14: { name: "سيليكون", symbol: "Si", electrons: 14, shells: [2, 8, 4] },
+            15: { name: "فوسفور", symbol: "P", electrons: 15, shells: [2, 8, 5] },
+            16: { name: "كبريت", symbol: "S", electrons: 16, shells: [2, 8, 6] },
+            17: { name: "كلور", symbol: "Cl", electrons: 17, shells: [2, 8, 7] }
+        };
+
+        // توليد أزرار الجدول الدوري ديناميكياً
+        const tableContainer = document.getElementById('periodic-table');
+        for (let i = 1; i <= 17; i++) {
+            let atom = atomsData[i];
+            let card = document.createElement('div');
+            card.className = 'element-card';
+            card.innerHTML = `
+                <div class="num">${i}</div>
+                <div class="sym">${atom.symbol}</div>
+                <div class="name">${atom.name}</div>
+            `;
+            card.onclick = () => selectAtom(i);
+            tableContainer.appendChild(card);
+        }
+
+        let currentAtom = null;
+        let angle = 0;
+
+        function selectAtom(atomicNumber) {
+            currentAtom = atomsData[atomicNumber];
+            currentAtom.number = atomicNumber;
+            document.getElementById('periodic-table').style.display = 'none';
+            document.getElementById('back-btn').style.display = 'block';
+            document.getElementById('info').innerHTML = `العنصر: <b>${currentAtom.name} (${currentAtom.symbol})</b> | العدد الذري: <b>${atomicNumber}</b> | الإلكترونات: <b>${currentAtom.electrons}</b>`;
+        }
+
+        function showTable() {
+            currentAtom = null;
+            document.getElementById('periodic-table').style.display = 'grid';
+            document.getElementById('back-btn').style.display = 'none';
+            document.getElementById('info').innerHTML = 'اختر عنصراً (من العدد الذري 1 إلى 17) لاستكشاف بنيته';
+        }
+
+        // رسم النواة والمدارات والإلكترونات بنظام ثلاثي الأبعاد تفاعلي
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            if (currentAtom) {
+                angle += 0.02;
+                const centerX = canvas.width / 2;
+                const centerY = canvas.height / 2;
+
+                // 1. رسم النواة (تمثيل البروتونات داخل النواة المتوهجة)
+                ctx.save();
+                ctx.translate(centerX, centerY);
+                
+                let gradient = ctx.createRadialGradient(0, 0, 5, 0, 0, 50);
+                gradient.addColorStop(0, '#ff007f');
+                gradient.addColorStop(1, 'transparent');
+                ctx.fillStyle = gradient;
+                ctx.beginPath();
+                ctx.arc(0, 0, 60, 0, Math.PI * 2);
+                ctx.fill();
+
+                // رسم كرات البروتونات والنيوترونات في النواة
+                let protonsCount = currentAtom.number;
+                for (let i = 0; i < protonsCount; i++) {
+                    let subAngle = (i / protonsCount) * Math.PI * 2;
+                    let nx = Math.cos(subAngle + angle * 0.4) * (protonsCount > 8 ? 16 : 10);
+                    let ny = Math.sin(subAngle + angle * 0.4) * (protonsCount > 8 ? 16 : 10);
+                    
+                    ctx.beginPath();
+                    ctx.arc(nx, ny, 8, 0, Math.PI * 2);
+                    ctx.fillStyle = i % 2 === 0 ? '#ff3366' : '#ffcc00';
+                    ctx.shadowColor = ctx.fillStyle;
+                    ctx.shadowBlur = 12;
+                    ctx.fill();
+                }
+                ctx.restore();
+
+                // 2. رسم المدارات ومستويات الطاقة وتوزيع الإلكترونات
+                currentAtom.shells.forEach((electronCount, shellIndex) => {
+                    let radiusX = 85 + (shellIndex * 55);
+                    let radiusY = 35 + (shellIndex * 22); // منظور ثلاثي الأبعاد 3D
+
+                    ctx.save();
+                    ctx.translate(centerX, centerY);
+                    ctx.rotate(Math.PI / 5 * (shellIndex + 1)); // زاوية ميلان لكل مدار
+
+                    // رسم مسار المدار
+                    ctx.beginPath();
+                    ctx.ellipse(0, 0, radiusX, radiusY, 0, 0, Math.PI * 2);
+                    ctx.strokeStyle = `rgba(0, 255, 204, ${0.25 + shellIndex * 0.08})`;
+                    ctx.lineWidth = 1.5;
+                    ctx.stroke();
+
+                    // رسم الإلكترونات المتحركة على المدار
+                    for (let e = 0; e < electronCount; e++) {
+                        let eAngle = angle * (1.3 - shellIndex * 0.15) + (e * ((Math.PI * 2) / electronCount));
+                        let ex = Math.cos(eAngle) * radiusX;
+                        let ey = Math.sin(eAngle) * radiusY;
+
+                        ctx.beginPath();
+                        ctx.arc(ex, ey, 5.5, 0, Math.PI * 2);
+                        ctx.fillStyle = '#00ffcc';
+                        ctx.shadowColor = '#00ffcc';
+                        ctx.shadowBlur = 10;
+                        ctx.fill();
+                    }
+                    ctx.restore();
+                });
+            }
+
+            requestAnimationFrame(animate);
+        }
+
+        animate();
+    </script>
+</body>
+</html>
+
+    <script src="/script.js"></script>
+  </body>
+
+</html>
